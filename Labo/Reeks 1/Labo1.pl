@@ -1,6 +1,7 @@
 $string1 = "dit is een string gemaakt van woorden";
 @woorden1 = qw(dit is een array gemaakt van woorden);
 @woorden2 = qw(woord1 woord2 woord3 woord4 woord5);
+push @woordenMetDuplicaten, (@woorden2, qw(woord2 woord4));
 @cijfers1 = qw(0 1 2 3 4 5 6 7 8 9);
 @alfabet = qw(a b c d e f g h i j k l m n o p q r s t u v w x y z);
 $float1 = 3.14159265; 
@@ -219,8 +220,6 @@ undef(@result);
 @result = grep { length($_) == 3} @woorden1;
 print @result;
 
-=end comment
-=cut
 
 # 26) De Perl functie sort sorteert default in ascii volgorde.
 # Sorteer een array op de numerieke waarden.
@@ -228,6 +227,36 @@ print @result;
 print "@cijfers1\n";
 @cijfers1 = sort { $a <=> $b} @cijfers1;
 print "@cijfers1";
+
+
+# 27 Hoe kun je arrays met niet-benutte elementen, zogenaamde sparse array's,
+# implementeren zonder geheugenoverhead?
+# gebruik een hash ipv een array --> je kan elke index gebruiken die je wil,
+# en enkel deze plaatsen worden opgevuld in geheugen
+
+
+# 28 Verwijder duplicaten uit een lijst waarden.
+# Deze lijst kan bijvoorbeeld bekomen worden door een invoerbestand lijn per lijn in te lezen,
+# of door de individuele elementen van een array a priori in te vullen,
+# of door de uitvoer van een opdracht te verwerken.
+
+# 1) door invoerbestand lijn per lijn in te lezen
+@array = <>;
+# 2) door de elementen van een array a priori in te vullen
+@array = @woordenMetDuplicaten;
+# 3) door de uitvoer van een opdracht te verwerken, weet hier niet direct een voorbeeld van
+
+$/ = "\r\n";
+chomp @array;
+%hash = map { $_ => undef } @array;
+@unieke = sort keys %hash;
+print "'$_'\n"  for @unieke;
+
+=end comment
+=cut
+
+# 29) Bepaal de waarden van elementen die in een eerste array voorkomen, maar niet in een tweede.
+# Pas dit toe om lijnen van een bestand te filteren die niet voorkomen in een ander bestand.
 
 
 __DATA__
