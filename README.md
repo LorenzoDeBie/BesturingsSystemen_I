@@ -1,2 +1,2 @@
-# BesturingSystemen I
-Oefeningen Labo BesturingSystemen I
+# BesturingsSystemen I
+Oefeningen Labo BesturingsSystemen I
