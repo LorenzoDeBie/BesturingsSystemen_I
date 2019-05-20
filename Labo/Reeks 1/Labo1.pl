@@ -1,6 +1,7 @@
 $string1 = "dit is een string gemaakt van woorden";
 @woorden1 = qw(dit is een array gemaakt van woorden);
 @woorden2 = qw(woord1 woord2 woord3 woord4 woord5);
+@woorden3 = qw(woord2 woord4 woord5 woord6 woord7);
 push @woordenMetDuplicaten, (@woorden2, qw(woord2 woord4));
 @cijfers1 = qw(0 1 2 3 4 5 6 7 8 9);
 @alfabet = qw(a b c d e f g h i j k l m n o p q r s t u v w x y z);
@@ -248,15 +249,136 @@ print "@cijfers1";
 
 $/ = "\r\n";
 chomp @array;
-%hash = map { $_ => undef } @array;
+%hash = map { $_, undef } @array;
 @unieke = sort keys %hash;
 print "'$_'\n"  for @unieke;
 
-=end comment
-=cut
 
 # 29) Bepaal de waarden van elementen die in een eerste array voorkomen, maar niet in een tweede.
 # Pas dit toe om lijnen van een bestand te filteren die niet voorkomen in een ander bestand.
+%hash = map { $_, undef} @woorden2;
+delete @hash{@woorden3};
+print (@woorden2_only = keys %hash);
+
+
+# nu met twee files
+open(OLD, "test2.txt");
+%hash = map {$_, undef} <OLD>;
+open(NEW, "test2_half.txt");
+delete @hash{<NEW>};
+print keys %hash;
+
+
+# 30) Veronderstel dat je over twee lijsten beschikt, die elk geen duplikate waarden bevatten.
+# Bereken de intersectie-, de unie-, en de verschil-lijsten: elementen die in beide lijsten,
+# minstens in één van beide lijsten, of slechts in één van beide lijsten voorkomen.
+# hier werken met 
+%woorden2Hash = map {$_, $_} @woorden2;
+%woorden3Hash = map {$_, $_} @woorden3;
+
+# elementen in beide --> opgelet delete returns de values deleted, not the keys!
+# @beide = delete @woorden2Hash{@woorden3};
+# print "Beide:\n@beide\n";
+
+# minstens in één van beide
+%hash = map {$_, $_} (@woorden2, @woorden3);
+@minstens = keys %hash;
+print "Minstens 1:\n@minstens\n";
+
+# slechts in één van beide
+delete @woorden2Hash{@woorden3};
+delete @woorden3Hash{@woorden2};
+@enkel2 = keys %woorden2Hash;
+@enkel3 = keys %woorden3Hash;
+print "Enkel2:\n@enkel2\nEnkel3:\n@enkel3\n";
+
+
+# 31) Met welke twee functies kun je nagaan of een specifieke waarde optreedt als een index in een Hash?
+# exists (zal ook true teruggeven bij undef als waarde) OF defined (zal false terug geven ook bij undef)
+%woorden2Hash = map {$_,undef} @woorden2;
+print "woord1 exists\n" if exists $woorden2Hash{"woord1"};
+print "woord1 defined\n" if defined $woorden2Hash{"woord1"};
+
+
+# 32) Verwijder een hash element met een specifieke index.
+# Hoe kan dit veralgemeend worden tot meerdere elementen ?
+%woorden2Hash = map {$_,$_}@woorden2;
+delete $woorden2Hash{"woord1"};
+print keys %woorden2Hash;
+print "\n";
+#of meerdere
+delete @woorden2Hash{@woorden3};
+print keys %woorden2Hash;
+print "\n";
+
+
+# 33) Op welke manieren kun je elk index-waarde paar van een hash element per element verwerken ?
+# Hou er rekening mee dat verwerken in gesorteerde volgorde al dan niet gewenst is.
+# niet gesorteerd
+%hash = map {$_, "value"} @woorden2;
+while(($key, $value) = each(%hash)) {
+    print "$key => $value\n";
+}
+
+#gesorteerd
+%hash = map {$_, "value"} @woorden2;
+foreach $key (sort keys %hash) {
+    print "$key =>".$hash{$key}."\n";
+}
+
+
+# 34) Hoe kun je de inhoud van een hash tonen, waarbij een duidelijk onderscheid
+# gemaakt wordt tussen de indices en hun corresponderende waarden.
+# Eenvoudige pogingen zoals print"%hash" of print %hash blijken niet te voldoen.
+%hash = map{$_ => $_} @woorden2;
+while(($key, $value) = each(%hash)) {
+    print "$key: $value\n";
+}
+
+
+# 35) Inverteer een hash: construeer een hash met als indices de waarden van de originele hash,
+# en als waarden de corresponderende indices.
+# Je mag er in deze vraag veronderstellen dat ook de waarden van de originele hash geen duplikaten vertonen.
+# Dat probleem zal pas in reeks 4 vraag 9 aangepakt worden.
+for (0..4) {
+    $hash{@woorden2[$_]} = @woorden3[$_];
+}
+@indices = keys %hash;
+@waarden = values %hash;
+for(0..scalar(@indices) - 1) {
+    $omgekeerdeHash{@waarden[$_]} = @indices[$_];
+}
+
+
+#of veel korter
+%hash = map{"key".$_=>"val".$_} @cijfers1;
+while(($key, $value) = each(%hash)) {
+    print "$key => $value\n";
+}
+%omgekeerdeHash = reverse %hash;
+print "en nu omgekeerd\n";
+while(($key, $value) = each(%omgekeerdeHash)) {
+    print "$key => $value\n";
+}
+
+
+# 36) Verwerk de elementen van een hash in een gesorteerde volgorde,
+%hash = map{"key".$_ => "val".($#cijfers1 - $_)} @cijfers1;
+# hetzij alfabetisch of numeriek gesorteerd op de indices,
+foreach $key (sort keys %hash) {
+    $value = $hash{$key};
+    #do something with the pair
+    print "$key => $value\n";
+}
+# hetzij alfabetisch of numeriek gesorteerd op de waarden.
+foreach $key (sort {$hash{$a} cmp $hash{$b}} keys %hash) {
+    $value = $hash{$key};
+    #do semthing with the pair
+    print "$key => $value\n";
+}
+
+=end comment
+=cut
 
 
 __DATA__
