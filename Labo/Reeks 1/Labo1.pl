@@ -377,6 +377,98 @@ foreach $key (sort {$hash{$a} cmp $hash{$b}} keys %hash) {
     print "$key => $value\n";
 }
 
+
+# 37) Stel een nieuwe hash samen op basis van twee bestaande hashes.
+# Je hoeft geen rekening te houden met indices die in beide originele hashes zouden voorkomen.
+%hash1 = map{"key".$_ => "val".($#cijfers1 - $_)} @cijfers1[0..4];
+%hash2 = map{"key".$_ => "val".($#cijfers1 - $_)} @cijfers1[5..9];
+%samengestelde = (%hash1, %hash2); #dit kan omdat een hash in list context als volgt voorgesteld wordt: (key0, val0, key1, val1...) dus door de lijst langer te maken en daarna terug om te zetten naar een hash worden de hashen samengevoegd.
+while(($key, $val) = each(%samengestelde)) {
+    print "$key => $val\n";
+}
+
+
+# 38) Veronderstel dat je over twee hashes beschikt.
+# Bepaal enerzijds de indices die in beide hashes,
+%hash1 = map{"key".$_ => "val".($#cijfers1 - $_)} @cijfers1[0..6];
+%hash2 = map{"key".$_ => "val".($#cijfers1 - $_)} @cijfers1[4..9];
+foreach $index (keys %hash1) {
+    push @beide, $index if exists $hash2{$index};
+}
+print join ' ',@beide;
+print "\n";
+# en anderzijds de indices die slechts in één van beide hashes voorkomen.
+foreach $index (keys %hash1) {
+    push @enkelIn1, $index unless exists $hash2{$index};
+}
+foreach $index (keys %hash2) {
+    push @enkelIn2, $index unless exists $hash1{$index};
+}
+print "enkel in hash1:\n" . join ' ',@enkelIn1;
+print "\nenkel in hash2\n" . join ' ',@enkelIn2;
+print "\n";
+
+
+# 39) Hoe kun je best bepalen hoeveel keer elke waarde in een tabel optreedt ?
+# frequentietabel opstellen ==> hier eigenlijk frequentieHash
+%frequentietabel = ( );
+foreach $val (@woorden2, @woorden3) {
+    $frequentietabel{$val}++;
+}
+
+while(($key, $val) = each(%frequentietabel)) {
+    print "$key: $val\n";
+}
+
+
+# 40) Hoe kun je de inputgegevens van een programma samen met de broncode in één enkel bestand bundelen ?
+# je gebruikt het __DATA__ gedeelte van het programma, je kan dit gebruiken met <DATA>
+
+
+# 41) Schrijf het skelet van een filterprogramma.
+# Indien op de opdrachtlijn parameters worden meegegeven,
+# dan moeten deze beschouwd worden als de namen van de inputbestanden.
+# Indien er geen parameters zijn, dan moet het programma zijn invoer van de standaard invoer halen.
+# Een parameter "-" duidt aan dat de standaard invoer als één van de inputkanalen moet verwerkt worden.
+# Een parameter van de vorm "opdracht |" laat toe om de uitvoer van een ander programma als invoer te beschouwen.
+
+while(<>) {
+    print $_;
+}
+
+
+# 42) Wijzig een invoerbestand, door gebruik te maken van een intermediair hulpbestand.
+$old = "test.txt";
+$new = "nieuw.txt";
+open(OLD, "<", $old)        or die "cannot open $old";
+open(NEW, ">", $new)        or die "cannot open $new"; 
+
+while(<OLD>) {
+    #change $_;
+    print NEW $_;
+}
+print NEW "Deze file is aangepast";
+close(OLD);
+close(NEW);
+rename($old, "$old.orig");
+rename($new, $old);
+
+
+# 43)Wijzig een invoerbestand, zonder, zoals in vraag 42,
+# gebruik te maken van een intermediair hulpbestand ,
+# maar met behulp van de -i optie op de opdrachtlijn,
+# of door toekenning van de speciale variabele $^I.
+
+$^I = ".orig"; #dit zal de extensie zijn van de kopie van originele file
+$counter = 1;
+while(<>) {
+    chomp;
+    print "$_$counter\n"; #voorbeeld van aanpassing (nummer van regel toevoegen aan de regel)
+    print STDOUT "$_$counter\n"; #output in console
+    $counter++;
+}
+
+
 =end comment
 =cut
 
