@@ -13,3 +13,46 @@
              "Halle"       => "Vlaams-Brabant" , "Genk"    => "Limburg"        ,
              "Leuven"      => "Vlaams-Brabant" , "Hasselt" => "Limburg"        ,
              "Vilvoorde"   => "Vlaams-Brabant" , "Tongeren"=> "Limburg"        );
+             
+use Data::Dumper;
+
+# foreach $provincie ( keys %gewest ) {
+#     push @{ $structuur{ $gewest{$provincie} } }, $provincie;
+# }
+while ( ( $stad, $provincie ) = each %provincie ) {
+    $gewest = $gewest{$provincie};
+    push @{ $structuur{$gewest}->{$provincie} }, $stad;
+}
+
+print Dumper( \%structuur );
+
+# # print ? provincies{"Vlaanderen"}
+
+# # %provincies = ();
+# while ( ( $provincie, $gewest ) = each %gewest ) {
+
+#     # $provincies{$gewest} = [] unless $provincies{$gewest};
+#     push @{ $provincies{$gewest} }, $provincie;
+# }
+
+# # gecommente lijnen mogen weg want perl doet aan autovivivicatie
+
+# # for $provincie (keys %provincies) {
+# #     print "\n$provincie:\n\t\t";
+# #     print join "
+# #         ",@{$provincies{$provincie}};
+# # }
+
+# # print ? steden{"Vlaanderen"} ? {"West-Vlaanderen"} ?
+# # %steden = ();
+# # while (($stad,$provincie) = each %provincie) {
+# #     $gewest = $gewest{$provincie};
+# #     $steden{$gewest} = {} unless $steden{$gewest};
+# #     $steden{$gewest}->{$stad} = [] unless $steden{$gewest}->{$stad};
+# #     push
+# # }
+
+# # print ? steden{"Vlaanderen"} ?
+
+# print join "
+# ", sort map { @{$_} } values %{ $steden{"Vlaanderen"} };             
