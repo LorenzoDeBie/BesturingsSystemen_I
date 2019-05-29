@@ -1,4 +1,7 @@
-#Inverteer de hashes, zoals tijdens de inleidende les werd gedemonstreerd.
+=begin opgave
+Inverteer de hashes, zoals tijdens de inleidende les werd gedemonstreerd.
+=end opgave
+=cut
 %gewest=( "Antwerpen"      => "Vlaanderen", "Henegouwen"   => "Wallonie",
           "Limburg"        => "Vlaanderen", "Namen"        => "Wallonie",
           "Oost-Vlaanderen"=> "Vlaanderen", "Luik"         => "Wallonie",

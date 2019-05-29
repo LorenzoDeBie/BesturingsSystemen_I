@@ -1,6 +1,9 @@
-# Initialiseer twee twee-dimensionale array's, respectievelijk met 2x3 en met 3x2 elementen.
-# Interpreteer deze twee-dimensionale array's als matrices, voer de matrix-vermenigvuldiging uit,
-# en schrijf het resultaat uit.
+=begin opgave
+Initialiseer twee twee-dimensionale array's, respectievelijk met 2x3 en met 3x2 elementen.
+Interpreteer deze twee-dimensionale array's als matrices, voer de matrix-vermenigvuldiging uit,
+en schrijf het resultaat uit.
+=end opgave
+=cut
 
 @arr1 = ([1,2,3], [4,5,6]);
 @arr2 = ([1,2], [3,4], [5,6]);
