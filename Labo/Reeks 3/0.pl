@@ -16,43 +16,41 @@
              
 use Data::Dumper;
 
-# foreach $provincie ( keys %gewest ) {
-#     push @{ $structuur{ $gewest{$provincie} } }, $provincie;
-# }
-while ( ( $stad, $provincie ) = each %provincie ) {
-    $gewest = $gewest{$provincie};
-    push @{ $structuur{$gewest}->{$provincie} }, $stad;
+# print ? provincies{"Vlaanderen"} => een hash maken met alle provincies per gewest
+foreach $provincie ( keys %gewest ) {
+    #provincies is een hash
+    #$gewest{$provincie} is een string die het gewest voorstelt
+    #$provincies{ $gewest{$provincie} } zorgt er voor dat $gewest{$provincie} een key wordt van de hash
+    #de @{ $provincies{ $gewest{$provincie} } } zorgt er voor dat de value van de key een ref naar een array wordt
+    # we dereferencen deze ref ook direct en push voegt de provincie toe aan de array
+    push @{ $provincies{ $gewest{$provincie} } }, $provincie;
 }
 
-print Dumper( \%structuur );
+# print ? provincies{"Vlaanderen"} wordt:
+print join " ", @{$provincies{"Vlaanderen"}};
+print "\n";
+#$ voor provincies want provincies{"Vlannderen"} is een reference, @ voor de {} want het is een ref naar een array
 
-# # print ? provincies{"Vlaanderen"}
+# print ? steden{"Vlaanderen"} ? {"West-Vlaanderen"} ? => een hash maken met per gewest een reference naar een hash met provincies als key en values die elk naar een array van steden wijzen
+while (($stad, $provincie) = each( %provincie)) {
+    # we pushen een stad naar een array dus @{} want we hebben enkel ref naar array
+    # $gewest{$provincie} is de naam van het gewest van de provincie
+    # $steden = een hash => met $steden { $gewest{$provincie} } hebben we het dus op een value van de hash $steden
+    # met $steden{ $gewest{$provincie} }{$provincie} zorgen we er voor dat perl van de values automatisch een ref maakt naar een hash
+    # de value van deze hash moet dan een array worden ==> @{} zorgt daarvoor
+    #we pushen $stad naar de array die dus 2 levels diep zit in de hash
+    push @{ $steden{ $gewest{$provincie} }{$provincie} }, $stad;
+}
 
-# # %provincies = ();
-# while ( ( $provincie, $gewest ) = each %gewest ) {
+print join " ", @{ $steden{"Vlaanderen"}->{"West-Vlaanderen"} };
+print "\n";
+#uncomment dit om de structuur te zien:
+#print Dumper(\%steden);
 
-#     # $provincies{$gewest} = [] unless $provincies{$gewest};
-#     push @{ $provincies{$gewest} }, $provincie;
-# }
-
-# # gecommente lijnen mogen weg want perl doet aan autovivivicatie
-
-# # for $provincie (keys %provincies) {
-# #     print "\n$provincie:\n\t\t";
-# #     print join "
-# #         ",@{$provincies{$provincie}};
-# # }
-
-# # print ? steden{"Vlaanderen"} ? {"West-Vlaanderen"} ?
-# # %steden = ();
-# # while (($stad,$provincie) = each %provincie) {
-# #     $gewest = $gewest{$provincie};
-# #     $steden{$gewest} = {} unless $steden{$gewest};
-# #     $steden{$gewest}->{$stad} = [] unless $steden{$gewest}->{$stad};
-# #     push
-# # }
-
-# # print ? steden{"Vlaanderen"} ?
-
-# print join "
-# ", sort map { @{$_} } values %{ $steden{"Vlaanderen"} };             
+# print ? steden{"Vlaanderen"} ?
+# values %{ $steden{"Vlaanderen"} } is een array van references naar arrays
+# map maakt een list met alle arrays na elkaar (geen references meer) --> 1 grote array
+# join zet deze allemaal samen
+print join "
+", map { @{$_} } values %{ $steden{"Vlaanderen"} };
+print "\n";
