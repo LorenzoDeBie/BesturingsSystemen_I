@@ -23,9 +23,9 @@ dan moet volgende verzameling overblijvende supernetwerkadressen geproduceerd wo
 =cut
 
 use Data::Dumper; # for debugging purposes
-$DEBUG = 1;
+$DEBUG = 0;
 
-@ARGV = qw(141.96/12 141.99.88/23 141.99.160/21 141.103.66/22);
+@ARGV = qw(141.96/12 141.99.88/23 141.99.160/21 141.103.66/27);
 
 # Voorbereiding: Voor iedere prefix de lengte weten en van iedere lengte de prefix kunnen opzoeken
 $aantal_adressen = 1/2;
@@ -37,6 +37,7 @@ for (reverse 0..32) {
 # debug info
 print Dumper(\@aantal),"\n",Dumper(\%lengte),"\n" if $DEBUG;
 
+$error = 0;
 # Stap 1: input controlleren en eerste adres omzetten naar decimaal en grootte bepalen
 for $adres (@ARGV) {
     # adres splitten op iedere mogelijke '.' of '/' => ik krijg een array met ieder nummer van ip en als laatste prefix voor lengte
@@ -52,37 +53,61 @@ for $adres (@ARGV) {
     # controlleren of er nog 1 bits zijn na de prefix --> adres is verkeerd
     if($start_adres_decimaal %$aantal[$ip[4]]) {
         $ip[4]++ while($start_adres_decimaal % $aantal[$ip[4]]);
-        print "$adres heeft min /$ip[4] nodig!\n";
+        print "$adres heeft min /$ip[4] nodig!\n" if $DEBUG;
         $error++;
     }
     push @V,[$start_adres_decimaal, $aantal[$ip[4]]] unless @V;
 }
 exit(0) if $error;
 
+print "Stap 2\n" if $DEBUG;
 # adres ISP skippen
 shift @ARGV;
 # Stap 2: alle subnetwerken verwijderen uit supernetwerk (en het supernetwerk dus splitsen)
-for $sub (@ARGV) {
+while (@ARGV) {
+    $sub = $ARGV[0];
     #zelfde als hierboven
-    my @ip = split "[.\/]",$adres;
+    my @ip = split "[.\/]",$sub;
     splice @ip,@ip-1,0,0 while (@ip < 5);
     my $start_adres_decimaal = 0;
     $start_adres_decimaal = $start_adres_decimaal * 256 + $ip[$_] for (0..3);
     my $index = -1;
-    for $sup (@V) {
+    my $found = 0;
+    for $sup_ref (@V) {
         $index++;
         #kijken of het startadres in het supernetwerk ligt
-        if($$sup[0] <= $start_adres_decimaal && $$sup[0] + $$sup[1] > $start_adres_decimaal) {
-            # als het supernetwerk gevonden is zijn er 2 opties:
-            # 1) het supernetwerk is gelijk aan het subnetwerk ==> supernetwerk verwijderen
-            if($start_adres_decimaal == $$sup[0] && $aantal[$ip[4]] && $$sup[1]) {
-                splice(@V,$index, 1);
+        if($$sup_ref[0] <= $start_adres_decimaal && $$sup_ref[0] + $$sup_ref[1] > $start_adres_decimaal) {
+            $found = 1;
+            print "Supernet van $sub ($start_adres_decimaal) is $$sup_ref[0]\n" if $DEBUG;
+            # als het supernetwerk groter is dan het subnetwerk --> opsplitsen
+            if($$sup_ref[1] > $aantal[$ip[4]]) {
+                $halve_grootte = $$sup_ref[1]/2;
+                splice(@V, $index, 1, ([$$sup_ref[0], $halve_grootte],[$$sup_ref[0] + $halve_grootte, $halve_grootte]));
+                print "Supernetwerk van $sub gesplitst!\n" if $DEBUG;
             }
-            # 2) het subnetwerk is kleiner dan het supernetwerk ==> supernetwerk delen door 2
-            else {
-                
+            # als het even groot is, is het supernetwerk gelijk aan het subnetwerk
+            elsif($$sup_ref[1] == $aantal[$ip[4]]) {
+                print "Supernetwerk van $sub ($start_adres_decimaal) is gelijk aan $$sup_ref[0]\n" if $DEBUG;
+                splice(@V,$index, 1);
+                shift @ARGV;
             }
             last;
         }
     }
+    #indien het supernet niet gevonden is, is het subnetwerk geen deel van het netwerk van de ISP --> negeren
+    shift @ARGV unless $found;
+}
+print Dumper(\@V) if $DEBUG;
+
+# Stap 3: Startadressen in decimaal formaat en lengtes veranderen naar prefixnotatie
+for $net_ref (@V) {
+    my @ip = ();
+    my $start = $$net_ref[0];
+    for(reverse 0..3) {
+        $ip[$_] = $start % 256;
+        $start /= 256;
+    }
+    pop @ip while(@ip > 1 && !$ip[-1]);
+    push @ip, $lengte{$$net_ref[1]};
+    print join("/", (join(".", @ip[0..(@ip-2)]), $ip[@ip - 1])),"\n";
 }
